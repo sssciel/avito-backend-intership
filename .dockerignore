@@ -1,0 +1,44 @@
+# Git
+.git
+.gitignore
+
+# Documentation
+*.md
+docs/
+
+# Tests
+*_test.go
+tests/
+coverage.out
+coverage.html
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# IDE
+.vscode
+.idea
+
+# Build artifacts
+bin/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Environment files (будут передаваться через docker-compose)
+.env
+.env.*
+cfg/.env
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml

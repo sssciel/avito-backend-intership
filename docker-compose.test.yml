@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  postgres-test:
+    image: postgres:16-alpine
+    container_name: avito-postgres-test
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: avito_test
+    ports:
+      - "54323:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d avito_test"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ./migrations:/docker-entrypoint-initdb.d
+    networks:
+      - avito-test-network
+
+  app-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: avito-app-test
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_HOST=postgres-test
+      - DB_PORT=5432
+      - DB_NAME=avito_test
+      - DB_USER=admin
+      - DB_PASSWORD=admin
+      - DB_SSLMODE=disable
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+    networks:
+      - avito-test-network
+
+networks:
+  avito-test-network:
+    driver: bridge

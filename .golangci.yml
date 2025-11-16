@@ -1,0 +1,71 @@
+# golangci-lint configuration
+# https://golangci-lint.run/usage/configuration/
+
+run:
+  timeout: 5m
+  tests: true
+  modules-download-mode: readonly
+
+linters:
+  enable:
+    - errcheck      # Проверка обработки ошибок
+    - gosimple      # Упрощение кода
+    - govet         # Статический анализ
+    - ineffassign   # Неиспользуемые присваивания
+    - staticcheck   # Расширенные статические проверки
+    - unused        # Неиспользуемый код
+    - gofmt         # Форматирование
+    - goimports     # Импорты
+    - misspell      # Опечатки в комментариях
+    - revive        # Замена golint
+    - bodyclose     # HTTP response body закрыт
+    - gosec         # Проверка безопасности
+    - unconvert     # Ненужные конвертации
+    - unparam       # Неиспользуемые параметры
+    - prealloc      # Предварительное выделение слайсов
+    - exportloopref # Экспорт переменных цикла
+
+linters-settings:
+  errcheck:
+    check-type-assertions: true
+    check-blank: true
+  
+  govet:
+    check-shadowing: true
+  
+  revive:
+    rules:
+      - name: exported
+        disabled: false
+      - name: package-comments
+        disabled: true
+  
+  gosec:
+    excludes:
+      - G404 # Использование weak random не критично для тестов
+  
+  goimports:
+    local-prefixes: github.com/sssciel/avito-backend-intership
+
+issues:
+  exclude-rules:
+    # Исключаем проверки для тестов
+    - path: _test\.go
+      linters:
+        - errcheck
+        - gosec
+        - unparam
+    
+    # Исключаем проверки для mock файлов
+    - path: mocks/
+      linters:
+        - unused
+        - deadcode
+  
+  max-issues-per-linter: 50
+  max-same-issues: 3
+
+output:
+  format: colored-line-number
+  print-issued-lines: true
+  print-linter-name: true

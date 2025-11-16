@@ -1,0 +1,50 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: avito-postgres
+    environment:
+      POSTGRES_DB: avito
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "54322:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d avito"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - avito-network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: avito-app
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=avito
+      - DB_USER=admin
+      - DB_PASSWORD=admin
+      - DB_SSLMODE=disable
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - avito-network
+    restart: unless-stopped
+
+networks:
+  avito-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
